@@ -1,6 +1,6 @@
 {
   "name": "stoneserver-scripting-types",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "TypeScript definition for stoneserver scripting system",
   "author": "CodeHz",
   "repository": {

@@ -59,7 +59,7 @@ interface CommandDefinition<TSystem> {
 }
 
 interface IStoneServerSystem<TSystem>
-  extends IServerSystem<IStoneServerSystem<TSystem>> {
+  extends IServerSystem<IStoneServerSystem<TSystem> & TSystem> {
   /**
    * Print somthing to server log
    * @param object objects to be printed
