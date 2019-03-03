@@ -116,13 +116,15 @@ interface IStoneServerSystem<TSystem>
    * Register a soft enum
    * @param name soft enum name
    * @param values soft enum values
-   * @param case_sensitive
    */
-  registerSoftEnum(
-    name: string,
-    values: string[],
-    case_sensitive?: boolean
-  ): void;
+  registerSoftEnum(name: string, values: string[]): void;
+
+  /**
+   * Update a soft enum
+   * @param name soft enum name
+   * @param values soft enum values
+   */
+  updateSoftEnum(name: string, values: string[]): void;
 
   /**
    * Transfer player to host:port (/transferserver)
