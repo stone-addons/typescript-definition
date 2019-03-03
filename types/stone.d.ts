@@ -61,6 +61,12 @@ declare namespace Server {
 
   interface IStoneServerSystem<TSystem>
     extends IServerSystem<IStoneServerSystem<TSystem>> {
+    /**
+     * Print somthing to server log
+     * @param object objects to be printed
+     */
+    log(...object: any[]): void;
+
     /** Broadcast a message (ExtAPI test), should same as broadcastEvent("minecraft:display_chat_event", message)  */
     broadcastMessage(message: string): void;
 
@@ -156,7 +162,13 @@ declare namespace Server {
      */
     broadcastExternalEvent(name: string, data: string): void;
 
-    checkAbility(callback: (player: IEntity, ability: string, prev_result: boolean) => boolean | undefined): void
+    checkAbility(
+      callback: (
+        player: IEntity,
+        ability: string,
+        prev_result: boolean
+      ) => boolean | undefined
+    ): void;
   }
 
   interface IVanillaServerSystemBase {
