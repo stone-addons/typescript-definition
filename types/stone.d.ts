@@ -55,7 +55,7 @@ interface ChatEventParameters {
 interface CommandDefinition<TSystem> {
   description: string;
   permission: 0 | 1 | 2 | 3 | 4;
-  overloads: CommandOverload<IStoneServerSystem<TSystem>>[];
+  overloads: CommandOverload<IStoneServerSystem<TSystem> & TSystem>[];
 }
 
 interface IStoneServerSystem<TSystem>
