@@ -1,9 +1,13 @@
 /// <reference types="minecraft-scripting-types-server" />
 
+type BlockPos = [number, number, number];
+type Vec3 = [number, number, number];
+type Vec2 = [number, number];
+
 interface CommandOrigin {
   name: string;
-  blockPos: [number, number, number];
-  worldPos: [number, number, number];
+  blockPos: BlockPos;
+  worldPos: Vec3;
   entity: IEntity;
   permissionLevel: 0 | 1 | 2 | 3 | 4;
 }
@@ -16,7 +20,7 @@ type CommandTypes = {
   float: number;
   bool: boolean;
   text: string;
-  position: [number, number, number];
+  position: Vec3;
   selector: IEntity[];
   json: object;
   "player-selector": IEntity[];
@@ -57,6 +61,16 @@ interface CommandDefinition<TSystem> {
   permission: 0 | 1 | 2 | 3 | 4;
   overloads: CommandOverload<IStoneServerSystem<TSystem> & TSystem>[];
 }
+
+interface ItemInstance {
+  name: string;
+  custom_name: string;
+  count: number;
+}
+
+type CheckFunction<TS extends any[]> = (
+  callback: (player: IEntity, ...ts: TS) => boolean | undefined
+) => void;
 
 interface IStoneServerSystem<TSystem>
   extends IServerSystem<IStoneServerSystem<TSystem> & TSystem> {
@@ -163,13 +177,16 @@ interface IStoneServerSystem<TSystem>
    */
   broadcastExternalEvent(name: string, data: string): void;
 
-  checkAbility(
-    callback: (
-      player: IEntity,
-      ability: string,
-      prev_result: boolean
-    ) => boolean | undefined
-  ): void;
+  checkAbility: CheckFunction<[string, boolean]>;
+  checkDestroy: CheckFunction<[BlockPos, boolean]>;
+  /**
+   * @deprecated use check useOn
+   */
+  checkBuild: CheckFunction<[BlockPos, boolean]>;
+  checkUse: CheckFunction<[ItemInstance, boolean]>;
+  checkUseOn: CheckFunction<[ItemInstance, BlockPos, Vec3, boolean]>;
+  checkInteract: CheckFunction<[IEntity, Vec3, boolean]>;
+  checkAttack: CheckFunction<[IEntity, boolean]>;
 }
 
 interface IVanillaServerSystemBase {
