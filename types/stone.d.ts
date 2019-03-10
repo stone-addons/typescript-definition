@@ -156,7 +156,7 @@ interface IStoneServerSystem<TSystem>
   openModalForm(
     player: IEntity,
     form: string
-  ): Promise<null | Array<string | number | boolean | null> | string>;
+  ): Promise<string>;
 
   /**
    * Query actor info
