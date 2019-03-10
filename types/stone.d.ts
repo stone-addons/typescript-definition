@@ -69,7 +69,7 @@ interface ItemInstance {
 }
 
 type CheckFunction<TS extends any[]> = (
-  callback: (player: IEntity, ...ts: TS) => boolean | undefined
+  callback: (player: IEntity, ...ts: TS) => boolean | void
 ) => void;
 
 interface IStoneServerSystem<TSystem>
