@@ -75,8 +75,8 @@ interface BlockInfo {
     states: {
       type: "compound";
       value: any;
-    }
-  }
+    };
+  };
 }
 
 interface IStoneServerSystem<TSystem>
@@ -182,41 +182,65 @@ interface IStoneServerSystem<TSystem>
   broadcastExternalEvent(name: string, data: string): void;
 
   checkAbility(
-    player: IEntity,
-    ability: string,
-    result: boolean
-  ): boolean | void;
-  checkDestroy(player: IEntity, pos: BlockPos, result: boolean): boolean | void;
-  checkBuild(player: IEntity, pos: BlockPos, result: boolean): boolean | void;
+    callback: (
+      player: IEntity,
+      ability: string,
+      result: boolean
+    ) => boolean | void
+  ): void;
+  checkDestroy(
+    callback: (
+      player: IEntity,
+      pos: BlockPos,
+      result: boolean
+    ) => boolean | void
+  ): void;
+  checkBuild(
+    callback: (
+      player: IEntity,
+      pos: BlockPos,
+      result: boolean
+    ) => boolean | void
+  ): void;
   checkUse(
-    player: IEntity,
-    item: ItemInstance,
-    result: boolean
-  ): boolean | void;
+    callback: (
+      player: IEntity,
+      item: ItemInstance,
+      result: boolean
+    ) => boolean | void
+  ): void;
   checkUseBlock(
-    player: IEntity,
-    block: BlockInfo,
-    pos: BlockPos,
-    result: boolean
-  ): boolean | void;
+    callback: (
+      player: IEntity,
+      block: BlockInfo,
+      pos: BlockPos,
+      result: boolean
+    ) => boolean | void
+  ): void;
   checkUseOn(
-    player: IEntity,
-    item: ItemInstance,
-    pos: BlockPos,
-    vec: Vec3,
-    result: boolean
-  ): boolean | void;
+    callback: (
+      player: IEntity,
+      item: ItemInstance,
+      pos: BlockPos,
+      vec: Vec3,
+      result: boolean
+    ) => boolean | void
+  ): void;
   checkInteract(
-    player: IEntity,
-    target: IEntity,
-    vec: Vec3,
-    result: boolean
-  ): boolean | void;
+    callback: (
+      player: IEntity,
+      target: IEntity,
+      vec: Vec3,
+      result: boolean
+    ) => boolean | void
+  ): void;
   checkAttack(
-    player: IEntity,
-    target: IEntity,
-    result: boolean
-  ): boolean | void;
+    callback: (
+      player: IEntity,
+      target: IEntity,
+      result: boolean
+    ) => boolean | void
+  ): void;
 }
 
 interface IVanillaServerSystemBase {
