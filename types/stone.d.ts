@@ -68,9 +68,16 @@ interface ItemInstance {
   count: number;
 }
 
-type CheckFunction<TS extends any[]> = (
-  callback: (player: IEntity, ...ts: TS) => boolean | void
-) => void;
+interface BlockInfo {
+  type: "compound";
+  value: {
+    name: string;
+    states: {
+      type: "compound";
+      value: any;
+    }
+  }
+}
 
 interface IStoneServerSystem<TSystem>
   extends IServerSystem<IStoneServerSystem<TSystem> & TSystem> {
@@ -153,10 +160,7 @@ interface IStoneServerSystem<TSystem>
    * @param player target player
    * @param form form json string
    */
-  openModalForm(
-    player: IEntity,
-    form: string
-  ): Promise<string>;
+  openModalForm(player: IEntity, form: string): Promise<string>;
 
   /**
    * Query actor info
@@ -177,16 +181,42 @@ interface IStoneServerSystem<TSystem>
    */
   broadcastExternalEvent(name: string, data: string): void;
 
-  checkAbility: CheckFunction<[string, boolean]>;
-  checkDestroy: CheckFunction<[BlockPos, boolean]>;
-  /**
-   * @deprecated use check useOn
-   */
-  checkBuild: CheckFunction<[BlockPos, boolean]>;
-  checkUse: CheckFunction<[ItemInstance, boolean]>;
-  checkUseOn: CheckFunction<[ItemInstance, BlockPos, Vec3, boolean]>;
-  checkInteract: CheckFunction<[IEntity, Vec3, boolean]>;
-  checkAttack: CheckFunction<[IEntity, boolean]>;
+  checkAbility(
+    player: IEntity,
+    ability: string,
+    result: boolean
+  ): boolean | void;
+  checkDestroy(player: IEntity, pos: BlockPos, result: boolean): boolean | void;
+  checkBuild(player: IEntity, pos: BlockPos, result: boolean): boolean | void;
+  checkUse(
+    player: IEntity,
+    item: ItemInstance,
+    result: boolean
+  ): boolean | void;
+  checkUseBlock(
+    player: IEntity,
+    block: BlockInfo,
+    pos: BlockPos,
+    result: boolean
+  ): boolean | void;
+  checkUseOn(
+    player: IEntity,
+    item: ItemInstance,
+    pos: BlockPos,
+    vec: Vec3,
+    result: boolean
+  ): boolean | void;
+  checkInteract(
+    player: IEntity,
+    target: IEntity,
+    vec: Vec3,
+    result: boolean
+  ): boolean | void;
+  checkAttack(
+    player: IEntity,
+    target: IEntity,
+    result: boolean
+  ): boolean | void;
 }
 
 interface IVanillaServerSystemBase {
