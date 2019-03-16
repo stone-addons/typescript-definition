@@ -1,5 +1,7 @@
 /// <reference types="minecraft-scripting-types-server" />
 
+type API_LEVEL = 1;
+
 type BlockPos = [number, number, number];
 type Vec3 = [number, number, number];
 type Vec2 = [number, number];
@@ -25,21 +27,33 @@ type CommandTypes = {
   json: object;
   "player-selector": IEntity[];
 };
-type CommandArgument =
-  | {
+
+type CommandArgument<K> = K extends keyof CommandTypes
+  ? {
       name: string;
-      type: Exclude<keyof CommandTypes, "soft-enum">;
+      type: K;
       optional?: true;
-    }
-  | {
-      name: string;
-      type: "soft-enum";
-      enum: string;
-      optional?: true;
-    };
-interface CommandOverload<TSystem> {
-  parameters: CommandArgument[];
-  handler: (this: TSystem, ...args: any[]) => void;
+    } & (K extends "soft-enum" ? { enum: string } : {})
+  : never;
+type MappedArgsDefs<T extends Array<keyof CommandTypes>> = {
+  readonly [K in keyof T]: CommandArgument<T[K]>
+};
+type MappedArgs<T extends Array<keyof CommandTypes>> = {
+  readonly [K in keyof T]: T[K] extends keyof CommandTypes
+    ? CommandTypes[T[K]]
+    : never
+};
+
+interface CommandOverload<
+  TSystem,
+  TArgs extends Array<keyof CommandTypes> = Array<keyof CommandTypes>
+> {
+  parameters: MappedArgsDefs<TArgs>;
+  handler: (
+    this: TSystem,
+    origin: CommandOrigin,
+    args: MappedArgs<TArgs>
+  ) => void;
 }
 interface ActorInfo {
   name: string;
@@ -79,6 +93,73 @@ interface BlockInfo {
   };
 }
 
+type Checks =
+  | "ability"
+  | "destroy"
+  | "build"
+  | "use"
+  | "use_block"
+  | "use_on"
+  | "interact"
+  | "attack";
+
+type CheckInfo<T extends Checks> = T extends "ability"
+  ? {
+      type: T;
+      ability: string;
+    }
+  : T extends "destroy"
+  ? {
+      type: T;
+      block: BlockInfo;
+      blockpos: BlockPos;
+    }
+  : T extends "build"
+  ? {
+      type: T;
+      blockpos: BlockPos;
+    }
+  : T extends "use"
+  ? {
+      type: T;
+      item: ItemInstance;
+    }
+  : T extends "use_block"
+  ? {
+      type: T;
+      block: BlockInfo;
+      blockpos: BlockPos;
+    }
+  : T extends "use_on"
+  ? {
+      type: T;
+      block: BlockInfo;
+      item: ItemInstance;
+      blockpos: BlockPos;
+      position: Vec3;
+    }
+  : T extends "interact"
+  ? {
+      type: T;
+      target: IEntity;
+      blockpos: BlockPos;
+    }
+  : T extends "attack"
+  ? {
+      type: T;
+      target: IEntity;
+      blockpos: BlockPos;
+    }
+  : never;
+
+type CheckInfoCallback<T extends Checks> = (
+  player: IEntity,
+  info: CheckInfo<T>,
+  result: boolean
+) => boolean | void;
+
+type SystemType<TSystem = {}> = IStoneServerSystem<TSystem> & TSystem;
+
 interface IStoneServerSystem<TSystem>
   extends IServerSystem<IStoneServerSystem<TSystem> & TSystem> {
   /**
@@ -89,9 +170,6 @@ interface IStoneServerSystem<TSystem>
 
   /** Broadcast a message (ExtAPI test), should same as broadcastEvent("minecraft:display_chat_event", message)  */
   broadcastMessage(message: string): void;
-
-  /** Get current CommandOrigin inside Command Handler */
-  currentCommandOrigin(): CommandOrigin;
 
   /**
    * Execute command as current command origin
@@ -181,66 +259,14 @@ interface IStoneServerSystem<TSystem>
    */
   broadcastExternalEvent(name: string, data: string): void;
 
-  checkAbility(
-    callback: (
-      player: IEntity,
-      ability: string,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkDestroy(
-    callback: (
-      player: IEntity,
-      pos: BlockPos,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkBuild(
-    callback: (
-      player: IEntity,
-      pos: BlockPos,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkUse(
-    callback: (
-      player: IEntity,
-      item: ItemInstance,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkUseBlock(
-    callback: (
-      player: IEntity,
-      block: BlockInfo,
-      pos: BlockPos,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkUseOn(
-    callback: (
-      player: IEntity,
-      item: ItemInstance,
-      pos: BlockPos,
-      vec: Vec3,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkInteract(
-    callback: (
-      player: IEntity,
-      target: IEntity,
-      vec: Vec3,
-      result: boolean
-    ) => boolean | void
-  ): void;
-  checkAttack(
-    callback: (
-      player: IEntity,
-      target: IEntity,
-      result: boolean
-    ) => boolean | void
-  ): void;
+  checkAbility(callback: CheckInfoCallback<"ability">): void;
+  checkDestroy(callback: CheckInfoCallback<"destroy">): void;
+  checkBuild(callback: CheckInfoCallback<"build">): void;
+  checkUse(callback: CheckInfoCallback<"use">): void;
+  checkUseBlock(callback: CheckInfoCallback<"use_block">): void;
+  checkUseOn(callback: CheckInfoCallback<"use_on">): void;
+  checkInteract(callback: CheckInfoCallback<"interact">): void;
+  checkAttack(callback: CheckInfoCallback<"attack">): void;
 }
 
 interface IVanillaServerSystemBase {
@@ -251,6 +277,14 @@ interface IVanillaServerSystemBase {
     eventIdentifier: "stoneserver:chat_received",
     params: ChatEventParameters
   ): boolean | null;
+}
+
+interface IServer {
+  /**
+   * Print somthing to server log
+   * @param object objects to be printed
+   */
+  log(...object: any[]): void;
 }
 
 type SQLite3Param =
@@ -272,3 +306,4 @@ declare class SQLite3 {
 }
 
 declare const globalThis: object;
+declare function checkApiLevel(level: API_LEVEL): void;
