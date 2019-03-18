@@ -1,5 +1,7 @@
 /// <reference types="./types/stone" />
 
+import { isPlayerInfo } from "./index";
+
 checkApiLevel(1);
 
 type MSystem = SystemType;
@@ -18,20 +20,26 @@ system.initialize = function() {
             name: "str"
           }
         ],
-        handler(origin, [str]) {}
+        handler(origin, [str]) {
+          const info = this.actorInfo(origin.entity);
+          if (isPlayerInfo(info)) {
+            server.log(info.permission);
+          }
+        }
       } as CommandOverload<MSystem, ["string"]>,
       {
         parameters: [
           {
             type: "player-selector",
             name: "str"
-          }, {
+          },
+          {
             type: "message",
             name: "boom"
           }
         ],
         handler(origin, [players, message]) {}
-      } as CommandOverload<MSystem, ["player-selector", "message"]>,
+      } as CommandOverload<MSystem, ["player-selector", "message"]>
     ]
   });
 };

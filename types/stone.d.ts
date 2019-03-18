@@ -55,15 +55,38 @@ interface CommandOverload<
     args: MappedArgs<TArgs>
   ) => void;
 }
-interface ActorInfo {
+type ActorInfoBase = {
+  identifier: string;
   name: string;
-  identifier: IEntity["__identifier__"];
   pos: [number, number, number];
   dim: number;
-  permission?: number;
-  uuid?: string;
-  xuid?: string;
-}
+  variant: number;
+  airSupply: [number, number];
+  strength: [number, number];
+  health: [number, number];
+  age: number;
+  ride: IEntity | null;
+  rideRoot: IEntity | null;
+  target: IEntity | null;
+  armors: [
+    ItemInstance | null,
+    ItemInstance | null,
+    ItemInstance | null,
+    ItemInstance | null
+  ];
+};
+type PlayerInfo = ActorInfoBase & {
+  identifier: "minecraft:player";
+  permission: number;
+  uuid: string;
+  xuid: string;
+  selectedItem: ItemInstance;
+  sleepTimer: number;
+  attackDamage: number;
+  agent: IEntity | null;
+};
+
+type ActorInfo = ActorInfoBase | PlayerInfo;
 
 interface ChatEventParameters {
   sender: IEntity;
