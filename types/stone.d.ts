@@ -80,6 +80,7 @@ type PlayerInfo = ActorInfoBase & {
   permission: number;
   uuid: string;
   xuid: string;
+  spawnPoint: [number, number, number];
   selectedItem: ItemInstance;
   sleepTimer: number;
   attackDamage: number;
