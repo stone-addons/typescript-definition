@@ -258,6 +258,13 @@ interface IStoneServerSystem<TSystem>
   transferPlayer(player: IEntity, host: string, port: number): void;
 
   /**
+   * Change actor dimension
+   * @param actor target actor
+   * @param dim target dimension
+   */
+  changeDimension(actor: IEntity, dim: number): void;
+
+  /**
    * Open a modal form for specify player
    * @param player target player
    * @param form form json string
