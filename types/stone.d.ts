@@ -55,6 +55,9 @@ interface CommandOverload<
     args: MappedArgs<TArgs>
   ) => void;
 }
+type WorldInfo = {
+  spawnPoint: [number, number, number];
+};
 type ActorInfoBase = {
   identifier: string;
   name: string;
@@ -63,7 +66,6 @@ type ActorInfoBase = {
   variant: number;
   airSupply: [number, number];
   strength: [number, number];
-  health: [number, number];
   age: number;
   ride: IEntity | null;
   rideRoot: IEntity | null;
@@ -276,6 +278,11 @@ interface IStoneServerSystem<TSystem>
    * @param actor target actor
    */
   actorInfo(actor: IEntity): ActorInfo;
+
+  /**
+   * Query world info
+   */
+  worldInfo(): WorldInfo;
 
   /**
    * mute the chat so that you can provide a alternative chat handler
