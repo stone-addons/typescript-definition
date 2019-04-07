@@ -343,5 +343,4 @@ declare class SQLite3 {
   update(sql: string, params: SQLite3Param): number;
 }
 
-declare const globalThis: object;
 declare function checkApiLevel(level: API_LEVEL): void;
